@@ -1,0 +1,66 @@
+group 'com.example.flutter_wxwork'
+version '1.0'
+
+buildscript {
+    repositories {
+        google()
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath 'com.android.tools.build:gradle:7.3.0'
+    }
+}
+
+// 定义一个方法, 用于获取当前moudle的dir
+def getCurrentProjectDir() {
+    String result = ""
+    rootProject.allprojects { project ->
+        if (project.properties.get("identityPath").toString() == ":flutter_wxwork") {
+            result = project.properties.get("projectDir").toString()
+        }
+    }
+    return result
+}
+
+rootProject.allprojects {
+    def dir = getCurrentProjectDir()
+    repositories {
+        google()
+        mavenCentral()
+        maven { // 添加这个指向本地的仓库目录
+            url "$dir/aar"
+        }
+    }
+}
+
+apply plugin: 'com.android.library'
+
+android {
+    compileSdkVersion 31
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    defaultConfig {
+        minSdkVersion 24
+    }
+
+    dependencies {
+        testImplementation 'junit:junit:4.13.2'
+        testImplementation 'org.mockito:mockito-core:5.0.0'
+        implementation "com.tecent:sdk:2.0.12"
+    }
+
+    testOptions {
+        unitTests.all {
+            testLogging {
+                events "passed", "skipped", "failed", "standardOut", "standardError"
+                outputs.upToDateWhen { false }
+                showStandardStreams = true
+            }
+        }
+    }
+}
