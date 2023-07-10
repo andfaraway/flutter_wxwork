@@ -1,7 +1,7 @@
 name: flutter_wxwork
 description: A new Flutter plugin project.
 version: 0.0.1
-homepage:
+homepage: https://github.com/andfaraway/flutter_wxwork
 
 environment:
   sdk: '>=3.0.2 <4.0.0'
