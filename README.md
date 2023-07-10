@@ -34,6 +34,14 @@ ios/Runner/info.plist 增加 key：LSApplicationQueriesSchemes，添加 wxwork�
 
 2.在XCode中，选择你的工程设置项，选中“TARGETS”一栏，在“Info”标签栏的“URL Types”添加“URL Schemes”，其内容分别为你的scheme和corpId。
 
+
+若报错：+[NSData wwkapi_nilobj]
+
+可打开XCode打开项目，TARGETS -> Runner -> Build Settings -> Other Linker Flags添加
+```html
+$(inherited) -ObjC -l"WXWorkApi"
+```
+
 ## Android 配置
 
 ### 若为android11以上，需要在 android/src/main/AndroidManifest.xml 中添加 <queries>标签
