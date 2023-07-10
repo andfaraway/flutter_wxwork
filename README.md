@@ -5,6 +5,7 @@
 ## 使用方式
 
 ```dart
+import 'package:flutter_wxwork/flutter_wxwork.dart';
 
 final _flutterWxworkPlugin = FlutterWxwork();
 
