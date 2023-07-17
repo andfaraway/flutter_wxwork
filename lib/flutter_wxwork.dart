@@ -46,7 +46,7 @@ class AuthModel {
   factory AuthModel.fromJson(Map<String, dynamic> json) {
     AuthModel model = AuthModel();
     model.errCode = json['errCode'];
-    model.code = json['errCode'];
+    model.code = json['code'];
     model.state = json['state'];
     return model;
   }
