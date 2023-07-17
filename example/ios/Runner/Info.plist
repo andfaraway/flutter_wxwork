@@ -31,7 +31,7 @@
 			<string>scheme</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>wwauth7b44fc449ab4eabd000045</string>
+				<string>wwauth8f1e80541af434bd000002</string>
 			</array>
 		</dict>
 		<dict>
@@ -41,7 +41,7 @@
 			<string>corp</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>ww7b44fc449ab4eabd</string>
+				<string>ww8f1e80541af434bd</string>
 			</array>
 		</dict>
 	</array>
@@ -60,6 +60,8 @@
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
 	<string>Main</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>need use photo library</string>
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>

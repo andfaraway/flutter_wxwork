@@ -1,8 +1,10 @@
 package com.example.flutter_wxwork;
 
 import android.content.Context;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
+import android.text.TextUtils;
 import android.util.Log;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
@@ -11,9 +13,16 @@ import com.tencent.wework.api.IWWAPIEventHandler;
 import com.tencent.wework.api.WWAPIFactory;
 import com.tencent.wework.api.model.BaseMessage;
 import com.tencent.wework.api.model.WWAuthMessage;
+import com.tencent.wework.api.model.WWMediaFile;
+import com.tencent.wework.api.model.WWMediaImage;
+import com.tencent.wework.api.model.WWMediaLink;
+import com.tencent.wework.api.model.WWMediaText;
+import com.tencent.wework.api.model.WWMediaVideo;
 
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import io.flutter.embedding.engine.plugins.FlutterPlugin;
 import io.flutter.plugin.common.MethodCall;
@@ -49,41 +58,36 @@ public class FlutterWxworkPlugin implements FlutterPlugin, MethodCallHandler {
 
     @Override
     public void onMethodCall(@NonNull MethodCall call, @NonNull Result result) {
-        @SuppressWarnings("unchecked")
-        Map<String, String> arguments = (Map<String, String>) call.arguments;
+        switch (call.method) {
+            case "isAppInstalled":
+                boolean installed = iwwapi.isWWAppInstalled();
+                if (installed) {
+                    result.success("1");
+                } else {
+                    result.success("0");
+                }
+                break;
+            case "register":
+                APPID = call.argument("corpId");
+                SCHEMA = call.argument("scheme");
+                AGENTID = call.argument("agentId");
+                boolean hasRegister = iwwapi.registerApp(SCHEMA);
+                if (hasRegister) {
+                    result.success("1");
+                } else {
+                    result.success("0");
+                }
+                break;
+            case "auth":
+                String state = call.argument("state");
 
-        if (call.method.equals("isAppInstalled")) {
-            boolean installed = iwwapi.isWWAppInstalled();
-            if (installed) {
-                result.success("1");
-            } else {
-                result.success("0");
-            }
-        } else if (call.method.equals("register")) {
-            APPID = arguments.get("corpId");
-            SCHEMA = arguments.get("scheme");
-            AGENTID = arguments.get("agentId");
-            boolean hasRegister = iwwapi.registerApp(SCHEMA);
-            if (hasRegister) {
-                result.success("1");
-            } else {
-                result.success("0");
-            }
-        } else if (call.method.equals("auth")) {
-            String state = arguments.get("state");
+                final WWAuthMessage.Req req = new WWAuthMessage.Req();
+                req.sch = SCHEMA;
+                req.appId = APPID;
+                req.agentId = AGENTID;
+                req.state = state;
 
-            final WWAuthMessage.Req req = new WWAuthMessage.Req();
-            req.sch = SCHEMA;
-            req.appId = APPID;
-            req.agentId = AGENTID;
-            req.state = state;
-
-//            Toast.makeText(context, "sch：" + req.sch,
-//                    Toast.LENGTH_SHORT).show();
-
-            iwwapi.sendMessage(req, new IWWAPIEventHandler() {
-                @Override
-                public void handleResp(BaseMessage resp) {
+                iwwapi.sendMessage(req, resp -> {
                     if (resp instanceof WWAuthMessage.Resp) {
                         WWAuthMessage.Resp rsp = (WWAuthMessage.Resp) resp;
                         Map<String, String> map = new HashMap<>();
@@ -92,9 +96,94 @@ public class FlutterWxworkPlugin implements FlutterPlugin, MethodCallHandler {
                         map.put("state", String.valueOf(rsp.state));
                         result.success(map);
                     }
+                });
+                break;
+            case "share":
+                String packageName = context.getPackageName();
+                String appName;
+                try {
+                    ApplicationInfo info = context.getPackageManager().getApplicationInfo(context.getPackageName(), PackageManager.GET_META_DATA);
+                    appName = info.loadLabel(context.getPackageManager()).toString();
+                } catch (Exception e) {
+                    result.success("0");
+                    return;
                 }
-            });
 
+                String type = call.argument("type");
+                if (Objects.equals(type, "text")) {
+                    WWMediaText txt = new WWMediaText(call.argument("text"));
+                    txt.appPkg = packageName;
+                    txt.appName = appName;
+                    txt.appId = APPID; //企业唯一标识。创建企业后显示在，我的企业 CorpID字段
+                    txt.agentId = AGENTID; //应用唯一标识。显示在具体应用下的 AgentId字段
+                    iwwapi.sendMessage(txt, resp -> {
+                        if (resp instanceof WWMediaText) {
+                            result.success("1");
+                        }
+                    });
+                    break;
+                } else if (Objects.equals(type, "image")) {
+                    byte[] data = call.argument("data");
+                    WWMediaFile file = new WWMediaImage();
+                    file.fileName = call.argument("name");
+//                    file.filePath = call.argument("path");
+                    file.fileData = data;
+                    file.appPkg = packageName;
+                    file.appName = appName;
+                    file.appId = APPID; //企业唯一标识。创建企业后显示在，我的企业 CorpID字段
+                    file.agentId = AGENTID; //应用唯一标识。显示在具体应用下的 AgentId字段
+                    iwwapi.sendMessage(file, resp -> {
+                        if (resp instanceof WWMediaFile) {
+                            result.success("1");
+                        }
+                    });
+                } else if (Objects.equals(type, "video")) {
+                    byte[] data = call.argument("data");
+                    WWMediaVideo file = new WWMediaVideo();
+                    file.fileName = call.argument("name");
+                  //  file.filePath = call.argument("path");
+                    file.fileData = data;
+                    file.appPkg = packageName;
+                    file.appName = appName;
+                    file.appId = APPID; //企业唯一标识。创建企业后显示在，我的企业 CorpID字段
+                    file.agentId = AGENTID; //应用唯一标识。显示在具体应用下的 AgentId字段
+                    iwwapi.sendMessage(file, resp -> {
+                        if (resp instanceof WWMediaVideo) {
+                            result.success("1");
+                        }
+                    });
+                } else if (Objects.equals(type, "file")) {
+                    byte[] data = call.argument("data");
+                    WWMediaFile file = new WWMediaFile();
+                    file.fileName = call.argument("name");
+                    // file.filePath = call.argument("path");
+                    file.fileData = data;
+                    file.appPkg = packageName;
+                    file.appName = appName;
+                    file.appId = APPID; //企业唯一标识。创建企业后显示在，我的企业 CorpID字段
+                    file.agentId = AGENTID; //应用唯一标识。显示在具体应用下的 AgentId字段
+                    iwwapi.sendMessage(file, resp -> {
+                        if (resp instanceof WWMediaFile) {
+                            result.success("1");
+                        }
+                    });
+                } else if (Objects.equals(type, "link")) {
+                    WWMediaLink link = new WWMediaLink();
+                    link.thumbUrl = call.argument("icon");
+                    link.webpageUrl = call.argument("url");
+                    link.title = call.argument("title");
+                    link.description = call.argument("summary");
+                    link.appPkg = packageName;
+                    link.appName = appName;
+                    link.appId = APPID; //企业唯一标识。创建企业后显示在，我的企业 CorpID字段
+                    link.agentId = AGENTID; //应用唯一标识。显示在具体应用下的 AgentId字段
+                    iwwapi.sendMessage(link, resp -> {
+                        if (resp instanceof WWMediaLink) {
+                            result.success("1");
+                        }
+                    });
+                }
+                break;
         }
     }
 

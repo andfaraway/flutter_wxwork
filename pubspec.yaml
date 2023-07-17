@@ -1,6 +1,6 @@
 name: flutter_wxwork
 description: 企业微信授权登录flutter插件
-version: 0.0.2
+version: 0.0.6
 homepage: https://github.com/andfaraway/flutter_wxwork
 
 environment:

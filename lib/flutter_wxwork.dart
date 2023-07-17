@@ -31,15 +31,53 @@ class FlutterWxwork {
     }
   }
 
+  void shareText(String text) {
+    if (text.trim().isEmpty) {
+      assert(false, 'text is empty!');
+    }
+    methodChannel.invokeMethod('share', {
+      'type': ShareType.text.value,
+      'text': text,
+    });
+  }
+
+  void shareImage({
+    String? name,
+    required Uint8List data,
+  }) {
+    methodChannel.invokeMethod('share', {
+      'type': ShareType.image.value,
+      'name': name,
+      'data': data,
+    });
+  }
+
+  void shareLink({
+    required String title,
+    required String summary,
+    required String url,
+    String? icon,
+  }) {
+    if (url.trim().isEmpty) {
+      assert(false, 'url is empty!');
+    }
+    methodChannel.invokeMethod('share', {
+      'type': ShareType.link.value,
+      'title': title,
+      'summary': summary,
+      'url': url,
+      'icon': icon,
+    });
+  }
 }
-
-
 
 class AuthModel {
   /// 1.取消 0.成功 2.失败
   String? errCode;
   String? code;
   String? state;
+
+  bool get isSuccess => errCode == '1';
 
   AuthModel();
 
@@ -59,4 +97,15 @@ class AuthModel {
   String toString() {
     return jsonEncode(this);
   }
+}
+
+enum ShareType {
+  text,
+  image,
+  video,
+  link,
+}
+
+extension _ShareTypeEx on ShareType {
+  String get value => toString().split('.').last;
 }
