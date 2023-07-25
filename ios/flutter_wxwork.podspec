@@ -4,14 +4,14 @@
 #
 Pod::Spec.new do |s|
   s.name             = 'flutter_wxwork'
-  s.version          = '0.0.1'
-  s.summary          = 'A new Flutter plugin project.'
+  s.version          = '0.0.3'
+  s.summary          = '企业微信登录授权flutter插件。'
   s.description      = <<-DESC
 A new Flutter plugin project.
                        DESC
   s.homepage         = 'https://github.com/andfaraway/flutter_wxwork'
   s.license          = { :file => '../LICENSE' }
-  s.author           = { 'Your Company' => 'email@example.com' }
+  s.author           = { 'Your Company' => 'levikaslana@gmail.com' }
   s.source           = { :path => '.' }
   s.source_files = 'Classes/**/*'
   s.public_header_files = 'Classes/**/*.h'

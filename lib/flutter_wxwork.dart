@@ -41,6 +41,7 @@ class AuthModel {
   String? code;
   String? state;
 
+  bool get isSuccess =>  errCode == '1';
   AuthModel();
 
   factory AuthModel.fromJson(Map<String, dynamic> json) {
