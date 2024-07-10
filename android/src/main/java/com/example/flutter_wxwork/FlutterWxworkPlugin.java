@@ -95,6 +95,63 @@ public class FlutterWxworkPlugin implements FlutterPlugin, MethodCallHandler {
                 }
             });
 
+        } else if (call.method.equals("sendReq")) {
+            String packageName = context.getPackageName();
+            String appName;
+            try {
+                ApplicationInfo info = context.getPackageManager().getApplicationInfo(context.getPackageName(), PackageManager.GET_META_DATA);
+                appName = info.loadLabel(context.getPackageManager()).toString();
+            } catch (Exception e) {
+                result.success("0");
+                return;
+            }
+            if (!arguments.isEmpty()) {
+                if (!TextUtils.isEmpty(arguments.get("type"))) {
+                    String type = arguments.get("type");
+                    if ("1".equals(type)) {
+                        try {
+                            WWMediaText txt = new WWMediaText(arguments.get("text"));
+                            txt.appPkg = packageName;
+                            txt.appName = appName;
+                            txt.appId = APPID; //企业唯一标识。创建企业后显示在，我的企业 CorpID字段
+                            txt.agentId = AGENTID; //应用唯一标识。显示在具体应用下的 AgentId字段
+                            iwwapi.sendMessage(txt);
+                        } catch (Exception e) {
+                            result.success("0");
+                        }
+                    } else if ("2".equals(type)) {
+                        WWMediaImage img = new WWMediaImage();
+                        String data = arguments.get("data");
+                        if (TextUtils.isEmpty(data)) {
+                            result.success("0");
+                            return;
+                        }
+                        img.fileData = data.getBytes(StandardCharsets.UTF_8);
+                        img.appPkg = packageName;
+                        img.appName = appName;
+                        img.appId = APPID; //企业唯一标识。创建企业后显示在，我的企业 CorpID字段
+                        img.agentId = AGENTID;
+                        iwwapi.sendMessage(img);
+                    } else if ("3".equals(type)) {
+                        WWMediaLink link = new WWMediaLink();
+                        link.thumbUrl = arguments.get("iconurl");
+                        link.webpageUrl = arguments.get("url");
+                        link.title = arguments.get("title");
+                        link.description = arguments.get("summary");
+                        link.appPkg = packageName;
+                        link.appName = appName;
+                        link.appId = APPID; //企业唯一标识。创建企业后显示在，我的企业 CorpID字段
+                        link.agentId = AGENTID; //应用唯一标识。显示在具体应用下的 AgentId字段
+                        iwwapi.sendMessage(link);
+                    }else{
+                        result.success("0");
+                    }
+                }else{
+                    result.success("0");
+                }
+            }else{
+                result.success("0");
+            }
         }
     }
 
