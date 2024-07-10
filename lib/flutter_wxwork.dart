@@ -30,7 +30,27 @@ class FlutterWxwork {
       return false;
     }
   }
+  
+  Future<bool> sendReq(TextAttachment? text, FileAttachment? file, LinkAttachment? link) async {
+    if (text == null && file == null && link == null) {
+      assert(false, '发了个寂寞🐣');
+      return Future<bool>.value(false);
+    }
 
+    if (text != null) {
+      final result = await methodChannel.invokeMethod('sendReq', text.toJson());
+      return _stringToBool(result);
+    }
+    if (file != null) {
+      final result = await methodChannel.invokeMethod('sendReq', file.toJson());
+      return _stringToBool(result);
+    }
+    if (link != null) {
+      final result = await methodChannel.invokeMethod('sendReq', link.toJson());
+      return _stringToBool(result);
+    }
+    return Future<bool>.value(false);
+  }
 }
 
 
@@ -60,4 +80,39 @@ class AuthModel {
   String toString() {
     return jsonEncode(this);
   }
+}
+
+
+
+class TextAttachment {
+  static const int type = 1;
+  String? text;
+
+  Map<String, dynamic> toJson() =>
+    <String, dynamic>{'text': text, 'type': type};
+
+}
+
+//文件、图片、视频
+class FileAttachment {
+  static const int type = 2;
+  FileAttachment({required this.data});
+  Uint8List data;
+  Map toJson() => {'data': data, };
+}
+
+//文件、图片、视频
+class LinkAttachment {
+  static const int type = 2;
+  String? title;//不能超过512bytes
+  String? summary;//不能超过1k
+  String? url;
+  String? iconurl;
+  String? icon;
+  int? withShareTicket;
+  String? shareTicketState;
+
+  Map<String, dynamic> toJson() =>
+    <String, dynamic>{'title': title, 'summary': summary, 'url': url, 'iconurl': iconurl, 'icon': icon, 'withShareTicket': withShareTicket, 'shareTicketState': shareTicketState, 'type': type};
+
 }

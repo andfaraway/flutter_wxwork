@@ -30,6 +30,52 @@ FlutterResult authResult;
      req.state = call.arguments[@"state"];
      [WWKApi sendReq:req];
      authResult = result;
+  } else if ([@"sendReq" isEqualToString:call.method]) {
+      if (call.arguments) {
+          NSDictionary *dic = call.arguments;
+          if (dic[@"type"]) {
+              NSInteger type = [dic[@"type"] intValue];
+              if (type == 1) {
+                  WWKSendMessageReq * req = [[WWKSendMessageReq alloc] init];
+                  WWKMessageTextAttachment * text = [[WWKMessageTextAttachment alloc] init];
+                  text.text = dic[@"text"];
+                  req.attachment = text;
+                  [WWKApi sendReq:req];
+                  authResult = result;
+              } else if (type == 2) {
+                  if ([dic[@"data"] isKindOfClass:FlutterStandardTypedData.class]) {
+                      FlutterStandardTypedData *imageData = dic[@"data"];
+                      WWKSendMessageReq * req = [[WWKSendMessageReq alloc] init];
+                      WWKMessageFileAttachment * file = [[WWKMessageFileAttachment alloc] init];
+                      file.data = imageData.data;
+                      req.attachment = file;
+                      [WWKApi sendReq:req];
+                      authResult = result;
+                  }else{
+                      result(@"0");
+                  }
+              } else if (type == 3) {
+                  WWKSendMessageReq * req = [[WWKSendMessageReq alloc] init];
+                  WWKMessageLinkAttachment * link = [[WWKMessageLinkAttachment alloc] init];
+                  link.title = dic[@"title"];
+                  link.summary = dic[@"summary"];
+                  link.url = dic[@"url"];
+                  link.iconurl = dic[@"iconurl"];
+                  link.icon = dic[@"icon"];
+                  link.withShareTicket = dic[@"withShareTicket"];
+                  link.shareTicketState = dic[@"shareTicketState"];
+                  req.attachment = link;
+                  [WWKApi sendReq:req];
+                  authResult = result;
+              }else{
+                  result(@"0");
+              }
+          }else{
+              result(@"0");
+          }
+      }else{
+          result(@"0");
+      }
   }
 }
 
