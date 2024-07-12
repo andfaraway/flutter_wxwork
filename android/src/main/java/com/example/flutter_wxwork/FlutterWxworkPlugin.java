@@ -1,8 +1,10 @@
 package com.example.flutter_wxwork;
 
 import android.content.Context;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
+import android.text.TextUtils;
 import android.util.Log;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
@@ -11,6 +13,11 @@ import com.tencent.wework.api.IWWAPIEventHandler;
 import com.tencent.wework.api.WWAPIFactory;
 import com.tencent.wework.api.model.BaseMessage;
 import com.tencent.wework.api.model.WWAuthMessage;
+import com.tencent.wework.api.model.WWMediaFile;
+import com.tencent.wework.api.model.WWMediaImage;
+import com.tencent.wework.api.model.WWMediaLink;
+import com.tencent.wework.api.model.WWMediaText;
+import com.tencent.wework.api.model.WWMediaVideo;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -50,7 +57,7 @@ public class FlutterWxworkPlugin implements FlutterPlugin, MethodCallHandler {
     @Override
     public void onMethodCall(@NonNull MethodCall call, @NonNull Result result) {
         @SuppressWarnings("unchecked")
-        Map<String, String> arguments = (Map<String, String>) call.arguments;
+        Map<String, Object> arguments = (Map<String, Object>) call.arguments;
 
         if (call.method.equals("isAppInstalled")) {
             boolean installed = iwwapi.isWWAppInstalled();
@@ -60,9 +67,9 @@ public class FlutterWxworkPlugin implements FlutterPlugin, MethodCallHandler {
                 result.success("0");
             }
         } else if (call.method.equals("register")) {
-            APPID = arguments.get("corpId");
-            SCHEMA = arguments.get("scheme");
-            AGENTID = arguments.get("agentId");
+            APPID = String.valueOf(arguments.get("corpId"));
+            SCHEMA = String.valueOf(arguments.get("scheme"));
+            AGENTID = String.valueOf(arguments.get("agentId"));
             boolean hasRegister = iwwapi.registerApp(SCHEMA);
             if (hasRegister) {
                 result.success("1");
@@ -70,7 +77,7 @@ public class FlutterWxworkPlugin implements FlutterPlugin, MethodCallHandler {
                 result.success("0");
             }
         } else if (call.method.equals("auth")) {
-            String state = arguments.get("state");
+            String state = String.valueOf(arguments.get("state"));
 
             final WWAuthMessage.Req req = new WWAuthMessage.Req();
             req.sch = SCHEMA;
@@ -106,11 +113,11 @@ public class FlutterWxworkPlugin implements FlutterPlugin, MethodCallHandler {
                 return;
             }
             if (!arguments.isEmpty()) {
-                if (!TextUtils.isEmpty(arguments.get("type"))) {
-                    String type = arguments.get("type");
+                if (!TextUtils.isEmpty(String.valueOf(arguments.get("type")))) {
+                    String type = String.valueOf(arguments.get("type"));
                     if ("1".equals(type)) {
                         try {
-                            WWMediaText txt = new WWMediaText(arguments.get("text"));
+                            WWMediaText txt = new WWMediaText(String.valueOf(arguments.get("text")));
                             txt.appPkg = packageName;
                             txt.appName = appName;
                             txt.appId = APPID; //企业唯一标识。创建企业后显示在，我的企业 CorpID字段
@@ -120,24 +127,56 @@ public class FlutterWxworkPlugin implements FlutterPlugin, MethodCallHandler {
                             result.success("0");
                         }
                     } else if ("2".equals(type)) {
-                        WWMediaImage img = new WWMediaImage();
-                        String data = arguments.get("data");
-                        if (TextUtils.isEmpty(data)) {
-                            result.success("0");
-                            return;
+                        WWMediaFile file = new WWMediaFile();
+                        if (arguments.get("data") != null) {
+                            file.fileData = (byte[])arguments.get("data");
                         }
-                        img.fileData = data.getBytes(StandardCharsets.UTF_8);
+                        if (arguments.get("filename") != null) {
+                            file.fileName = String.valueOf(arguments.get("filename"));
+                        }
+                        if (arguments.get("path") != null) {
+                            file.filePath = String.valueOf(arguments.get("path"));
+                        }
+                        file.appPkg = packageName;
+                        file.appName = appName;
+                        file.appId = APPID; //企业唯一标识。创建企业后显示在，我的企业 CorpID字段
+                        file.agentId = AGENTID; //应用唯一标识。显示在具体应用下的 AgentId字段
+                        iwwapi.sendMessage(file);
+                    } else if ("3".equals(type)) {
+                        WWMediaImage img = new WWMediaImage();
+                        if (arguments.get("data") != null) {
+                            img.fileData = (byte[])arguments.get("data");
+                        }
+                        if (arguments.get("filename") != null) {
+                            img.fileName = String.valueOf(arguments.get("filename"));
+                        }
+                        if (arguments.get("path") != null) {
+                            img.filePath = String.valueOf(arguments.get("path"));
+                        }
                         img.appPkg = packageName;
                         img.appName = appName;
                         img.appId = APPID; //企业唯一标识。创建企业后显示在，我的企业 CorpID字段
                         img.agentId = AGENTID;
                         iwwapi.sendMessage(img);
-                    } else if ("3".equals(type)) {
+                    } else if ("4".equals(type)) {
+                        WWMediaVideo video = new WWMediaVideo();
+                        if (arguments.get("filename") != null) {
+                            video.fileName = String.valueOf(arguments.get("filename"));
+                        }
+                        if (arguments.get("path") != null) {
+                            video.filePath = String.valueOf(arguments.get("path"));
+                        }
+                        video.appPkg = packageName;
+                        video.appName = appName;
+                        video.appId = APPID; //企业唯一标识。创建企业后显示在，我的企业 CorpID字段
+                        video.agentId = AGENTID; //应用唯一标识。显示在具体应用下的 AgentId字段
+                        iwwapi.sendMessage(video);
+                    } else if ("5".equals(type)) {
                         WWMediaLink link = new WWMediaLink();
-                        link.thumbUrl = arguments.get("iconurl");
-                        link.webpageUrl = arguments.get("url");
-                        link.title = arguments.get("title");
-                        link.description = arguments.get("summary");
+                        link.thumbUrl = String.valueOf(arguments.get("iconurl"));
+                        link.webpageUrl = String.valueOf(arguments.get("url"));
+                        link.title = String.valueOf(arguments.get("title"));
+                        link.description = String.valueOf(arguments.get("summary"));
                         link.appPkg = packageName;
                         link.appName = appName;
                         link.appId = APPID; //企业唯一标识。创建企业后显示在，我的企业 CorpID字段
