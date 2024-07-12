@@ -43,18 +43,44 @@ FlutterResult authResult;
                   [WWKApi sendReq:req];
                   authResult = result;
               } else if (type == 2) {
+                  WWKSendMessageReq * req = [[WWKSendMessageReq alloc] init];
+                  WWKMessageFileAttachment * file = [[WWKMessageFileAttachment alloc] init];
+            
+                  file.filename = dic[@"filename"];
+                  file.path = dic[@"path"];
                   if ([dic[@"data"] isKindOfClass:FlutterStandardTypedData.class]) {
                       FlutterStandardTypedData *imageData = dic[@"data"];
-                      WWKSendMessageReq * req = [[WWKSendMessageReq alloc] init];
-                      WWKMessageFileAttachment * file = [[WWKMessageFileAttachment alloc] init];
                       file.data = imageData.data;
-                      req.attachment = file;
-                      [WWKApi sendReq:req];
-                      authResult = result;
-                  }else{
-                      result(@"0");
                   }
+                  req.attachment = file;
+                  [WWKApi sendReq:req];
+                  authResult = result;
               } else if (type == 3) {
+                  WWKSendMessageReq * req = [[WWKSendMessageReq alloc] init];
+                  WWKMessageImageAttachment * image = [[WWKMessageImageAttachment alloc] init];
+    
+                  image.filename = dic[@"filename"];
+                  image.path = dic[@"path"];
+                  if ([dic[@"data"] isKindOfClass:FlutterStandardTypedData.class]) {
+                      FlutterStandardTypedData *imageData = dic[@"data"];
+                      image.data = imageData.data;
+                  }
+                  req.attachment = image;
+                  [WWKApi sendReq:req];
+                  authResult = result;
+              }else if (type == 4) {
+                  WWKSendMessageReq * req = [[WWKSendMessageReq alloc] init];
+                  WWKMessageVideoAttachment * video = [[WWKMessageVideoAttachment alloc] init];
+                  video.filename = dic[@"filename"];
+                  video.path = dic[@"path"];
+                  if ([dic[@"data"] isKindOfClass:FlutterStandardTypedData.class]) {
+                      FlutterStandardTypedData *imageData = dic[@"data"];
+                      video.data = imageData.data;
+                  }
+                  req.attachment = video;
+                  [WWKApi sendReq:req];
+                  authResult = result;
+              } else if (type == 5) {
                   WWKSendMessageReq * req = [[WWKSendMessageReq alloc] init];
                   WWKMessageLinkAttachment * link = [[WWKMessageLinkAttachment alloc] init];
                   link.title = dic[@"title"];
