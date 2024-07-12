@@ -1,167 +1,149 @@
-#import "FlutterWxworkPlugin.h"
+import 'dart:convert';
+import 'package:flutter/services.dart';
 
-@implementation FlutterWxworkPlugin
+class FlutterWxwork {
+  final methodChannel = const MethodChannel('flutter_wxwork');
 
-FlutterMethodChannel *channel;
-FlutterResult authResult;
+  Future<bool> isAppInstalled() async {
+    final result = await methodChannel.invokeMethod<String>('isAppInstalled');
+    return _stringToBool(result);
+  }
 
-+ (void)registerWithRegistrar:(NSObject<FlutterPluginRegistrar>*)registrar {
-  channel = [FlutterMethodChannel
-      methodChannelWithName:@"flutter_wxwork"
-            binaryMessenger:[registrar messenger]];
-  FlutterWxworkPlugin* instance = [[FlutterWxworkPlugin alloc] init];
-  [registrar addMethodCallDelegate:instance channel:channel];
-  [registrar addApplicationDelegate:instance];
-}
+  Future<bool> register({required String scheme, required String corpId, required String agentId}) async {
+    String? result = await methodChannel.invokeMethod<String>('register', <String, String>{
+      'scheme': scheme,
+      'corpId': corpId,
+      'agentId': agentId,
+    });
+    return _stringToBool(result);
+  }
 
-- (void)handleMethodCall:(FlutterMethodCall*)call result:(FlutterResult)result {
-  if([@"isAppInstalled" isEqualToString:call.method]){
-      NSString *str = [NSString stringWithFormat:@"%hhd",[WWKApi isAppInstalled]];
-      result(str);
-   }else if ([@"register" isEqualToString:call.method]) {
-     NSDictionary *dic = call.arguments;
-     NSString *scheme = dic[@"scheme"];
-     NSString *corpId = dic[@"corpId"];
-     NSString *agentId = dic[@"agentId"];
-     result([NSString stringWithFormat:@"%hhd",[WWKApi registerApp:scheme corpId:corpId agentId:agentId]]);
-  } else if ([@"auth" isEqualToString:call.method]){
-     WWKSSOReq *req = [[WWKSSOReq alloc] init];
-     // state参数为这次请求的唯一标示，客户端需要维护其唯一性。SSO回调时会原样返回
-     req.state = call.arguments[@"state"];
-     [WWKApi sendReq:req];
-     authResult = result;
-  } else if ([@"sendReq" isEqualToString:call.method]) {
-      if (call.arguments) {
-          NSDictionary *dic = call.arguments;
-          if (dic[@"type"]) {
-              NSInteger type = [dic[@"type"] intValue];
-              if (type == 1) {
-                  WWKSendMessageReq * req = [[WWKSendMessageReq alloc] init];
-                  WWKMessageTextAttachment * text = [[WWKMessageTextAttachment alloc] init];
-                  text.text = dic[@"text"];
-                  req.attachment = text;
-                  [WWKApi sendReq:req];
-                  authResult = result;
-              } else if (type == 2) {
-                  WWKSendMessageReq * req = [[WWKSendMessageReq alloc] init];
-                  WWKMessageFileAttachment * file = [[WWKMessageFileAttachment alloc] init];
-            
-                  file.filename = dic[@"filename"];
-                  file.path = dic[@"path"];
-                  if ([dic[@"data"] isKindOfClass:FlutterStandardTypedData.class]) {
-                      FlutterStandardTypedData *imageData = dic[@"data"];
-                      file.data = imageData.data;
-                  }
-                  req.attachment = file;
-                  [WWKApi sendReq:req];
-                  authResult = result;
-              } else if (type == 3) {
-                  WWKSendMessageReq * req = [[WWKSendMessageReq alloc] init];
-                  WWKMessageImageAttachment * image = [[WWKMessageImageAttachment alloc] init];
-    
-                  image.filename = dic[@"filename"];
-                  image.path = dic[@"path"];
-                  if ([dic[@"data"] isKindOfClass:FlutterStandardTypedData.class]) {
-                      FlutterStandardTypedData *imageData = dic[@"data"];
-                      image.data = imageData.data;
-                  }
-                  req.attachment = image;
-                  [WWKApi sendReq:req];
-                  authResult = result;
-              }else if (type == 4) {
-                  WWKSendMessageReq * req = [[WWKSendMessageReq alloc] init];
-                  WWKMessageVideoAttachment * video = [[WWKMessageVideoAttachment alloc] init];
-                  video.filename = dic[@"filename"];
-                  video.path = dic[@"path"];
-                  if ([dic[@"data"] isKindOfClass:FlutterStandardTypedData.class]) {
-                      FlutterStandardTypedData *imageData = dic[@"data"];
-                      video.data = imageData.data;
-                  }
-                  req.attachment = video;
-                  [WWKApi sendReq:req];
-                  authResult = result;
-              } else if (type == 5) {
-                  WWKSendMessageReq * req = [[WWKSendMessageReq alloc] init];
-                  WWKMessageLinkAttachment * link = [[WWKMessageLinkAttachment alloc] init];
-                  link.title = dic[@"title"];
-                  link.summary = dic[@"summary"];
-                  link.url = dic[@"url"];
-                  link.iconurl = dic[@"iconurl"];
-                  link.icon = dic[@"icon"];
-                  link.withShareTicket = dic[@"withShareTicket"];
-                  link.shareTicketState = dic[@"shareTicketState"];
-                  req.attachment = link;
-                  [WWKApi sendReq:req];
-                  authResult = result;
-              }else{
-                  result(@"0");
-              }
-          }else{
-              result(@"0");
-          }
-      }else{
-          result(@"0");
-      }
+  Future<AuthModel> auth({String state = 'state'}) async {
+    var content = await methodChannel.invokeMethod('auth', {"state": state});
+    return AuthModel.fromJson(Map<String, dynamic>.from(content));
+  }
+
+  bool _stringToBool(String? string) {
+    if (string == '1') {
+      return true;
+    } else {
+      return false;
+    }
+  }
+  
+  Future<bool> sendReq(TextAttachment? text, FileAttachment? file, ImageAttachment? image, VideoAttachment? video, LinkAttachment? link) async {
+    if (text == null && file == null && image == null && video == null && link == null) {
+      assert(false, '发了个寂寞🐣');
+      return Future<bool>.value(false);
+    }
+
+    if (text != null) {
+      final result = await methodChannel.invokeMethod('sendReq', text.toJson());
+      return _stringToBool(result);
+    }
+    if (file != null) {
+      final result = await methodChannel.invokeMethod('sendReq', file.toJson());
+      return _stringToBool(result);
+    }
+    if (image != null) {
+      final result = await methodChannel.invokeMethod('sendReq', image.toJson());
+      return _stringToBool(result);
+    }
+    if (video != null) {
+      final result = await methodChannel.invokeMethod('sendReq', video.toJson());
+      return _stringToBool(result);
+    }
+    if (link != null) {
+      final result = await methodChannel.invokeMethod('sendReq', link.toJson());
+      return _stringToBool(result);
+    }
+    return Future<bool>.value(false);
   }
 }
 
 
-- (void)onResp:(WWKBaseResp *)resp {
-    /*! @brief 所有通过sendReq发送的SDK请求的结果都在这个函数内部进行异步回调
-     * @param resp SDK处理请求后的返回结果 需要判断具体是哪项业务的回调
-     */
-    /* SSO的回调 */
-    if ([resp isKindOfClass:[WWKSSOResp class]]) {
-        WWKSSOResp *r = (WWKSSOResp *)resp;
-        NSMutableDictionary *mDic = [[NSMutableDictionary alloc]init];
-        if([self isBlankString:r.code]){
-              [mDic setObject:@"1" forKey:@"errCode"];
-              [mDic setObject:@"" forKey:@"code"];
-        }else{
-             [mDic setObject:@"0" forKey:@"errCode"];
-             [mDic setObject:r.code forKey:@"code"];
-        }
-        [mDic setObject:r.state forKey:@"state"];
-        authResult(mDic);
-       // [channel invokeMethod:@"auth" arguments:mDic];
-    }
 
+class AuthModel {
+  /// 1.取消 0.成功 2.失败
+  String? errCode;
+  String? code;
+  String? state;
+
+  bool get isSuccess =>  errCode == '1';
+  AuthModel();
+
+  factory AuthModel.fromJson(Map<String, dynamic> json) {
+    AuthModel model = AuthModel();
+    model.errCode = json['errCode'];
+    model.code = json['code'];
+    model.state = json['state'];
+    return model;
+  }
+
+  Map<String, dynamic> toJson() {
+    return {'errorCode': errCode, 'code': code, 'state': state};
+  }
+
+  @override
+  String toString() {
+    return jsonEncode(this);
+  }
 }
 
 
-#pragma mark - AppDelegate
 
-- (BOOL)application:(UIApplication *)app openURL:(NSURL *)url options:(NSDictionary<UIApplicationOpenURLOptionsKey, id> *)options{
-    return [WWKApi handleOpenURL:url delegate:self];
-}
 
-- (BOOL)isBlankString:(NSString *)string{
+class TextAttachment {
+  static const int type = 1;
+  String? text;
 
-    if (string == nil) {
-
-        return YES;
-
-    }
-
-    if (string == NULL) {
-
-        return YES;
-
-    }
-
-    if ([string isKindOfClass:[NSNull class]]) {
-
-        return YES;
-
-    }
-
-    if ([[string stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]] length]==0) {
-
-        return YES;
-
-    }
-
-    return NO;
+  Map<String, dynamic> toJson() =>
+    <String, dynamic>{'text': text, 'type': type};
 
 }
-@end
+
+//文件
+class FileAttachment {
+  static const int type = 2;
+  FileAttachment({required this.filename, this.data, this.path});
+  String filename;
+  Uint8List? data;
+  String? path;
+  Map toJson() => {'data': data, 'filename': filename,'type': type, 'path': path};
+}
+
+//图片
+class ImageAttachment {
+  static const int type = 3;
+  ImageAttachment({required this.filename, this.data, this.path});
+  String filename;
+  Uint8List? data;
+  String? path;
+  Map toJson() => {'data': data, 'filename': filename,'type': type, 'path': path};
+}
+
+//视频
+class VideoAttachment {
+  static const int type = 4;
+  VideoAttachment({required this.filename, this.data, this.path});
+  String filename;
+  Uint8List? data;
+  String? path;
+  Map toJson() => {'data': data, 'filename': filename,'type': type, 'path': path};
+}
+
+//文件、图片、视频
+class LinkAttachment {
+  static const int type = 5;
+  String? title;//不能超过512bytes
+  String? summary;//不能超过1k
+  String? url;
+  String? iconurl;
+  String? icon;
+  int? withShareTicket;
+  String? shareTicketState;
+
+  Map<String, dynamic> toJson() =>
+    <String, dynamic>{'title': title, 'summary': summary, 'url': url, 'iconurl': iconurl, 'icon': icon, 'withShareTicket': withShareTicket, 'shareTicketState': shareTicketState, 'type': type};
+
+}
