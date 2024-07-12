@@ -31,8 +31,8 @@ class FlutterWxwork {
     }
   }
   
-  Future<bool> sendReq(TextAttachment? text, FileAttachment? file, LinkAttachment? link) async {
-    if (text == null && file == null && link == null) {
+  Future<bool> sendReq(TextAttachment? text, FileAttachment? file, ImageAttachment? image, VideoAttachment? video, LinkAttachment? link) async {
+    if (text == null && file == null && image == null && video == null && link == null) {
       assert(false, '发了个寂寞🐣');
       return Future<bool>.value(false);
     }
@@ -43,6 +43,14 @@ class FlutterWxwork {
     }
     if (file != null) {
       final result = await methodChannel.invokeMethod('sendReq', file.toJson());
+      return _stringToBool(result);
+    }
+    if (image != null) {
+      final result = await methodChannel.invokeMethod('sendReq', image.toJson());
+      return _stringToBool(result);
+    }
+    if (video != null) {
+      final result = await methodChannel.invokeMethod('sendReq', video.toJson());
       return _stringToBool(result);
     }
     if (link != null) {
@@ -84,6 +92,7 @@ class AuthModel {
 
 
 
+
 class TextAttachment {
   static const int type = 1;
   String? text;
@@ -93,17 +102,39 @@ class TextAttachment {
 
 }
 
-//文件、图片、视频
+//文件
 class FileAttachment {
   static const int type = 2;
-  FileAttachment({required this.data});
-  Uint8List data;
-  Map toJson() => {'data': data, };
+  FileAttachment({required this.filename, this.data, this.path});
+  String filename;
+  Uint8List? data;
+  String? path;
+  Map toJson() => {'data': data, 'filename': filename,'type': type, 'path': path};
+}
+
+//图片
+class ImageAttachment {
+  static const int type = 3;
+  ImageAttachment({required this.filename, this.data, this.path});
+  String filename;
+  Uint8List? data;
+  String? path;
+  Map toJson() => {'data': data, 'filename': filename,'type': type, 'path': path};
+}
+
+//视频
+class VideoAttachment {
+  static const int type = 4;
+  VideoAttachment({required this.filename, this.data, this.path});
+  String filename;
+  Uint8List? data;
+  String? path;
+  Map toJson() => {'data': data, 'filename': filename,'type': type, 'path': path};
 }
 
 //文件、图片、视频
 class LinkAttachment {
-  static const int type = 2;
+  static const int type = 5;
   String? title;//不能超过512bytes
   String? summary;//不能超过1k
   String? url;
