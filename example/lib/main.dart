@@ -43,7 +43,7 @@ class _MyAppState extends State<MyApp> {
                     title: 'register',
                     onTap: () async {
                       var result = await _flutterWxworkPlugin.register(
-                          scheme: 'wwauth7b44fc449ab4eabd000045', corpId: 'ww7b44fc449ab4eabd', agentId: '1000045');
+                          scheme: 'wwauth8f1e80541af434bd000002', corpId: 'ww8f1e80541af434bd', agentId: '1000002');
                       _showMessage('register = $result');
                     }),
                 _titleCell(

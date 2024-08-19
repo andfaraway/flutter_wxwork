@@ -1,8 +1,9 @@
 package com.example.flutter_wxwork;
 
 import android.content.Context;
-import android.util.Log;
-import android.widget.Toast;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
+import android.text.TextUtils;
 
 import androidx.annotation.NonNull;
 
@@ -11,7 +12,11 @@ import com.tencent.wework.api.IWWAPIEventHandler;
 import com.tencent.wework.api.WWAPIFactory;
 import com.tencent.wework.api.model.BaseMessage;
 import com.tencent.wework.api.model.WWAuthMessage;
+import com.tencent.wework.api.model.WWMediaImage;
+import com.tencent.wework.api.model.WWMediaLink;
+import com.tencent.wework.api.model.WWMediaText;
 
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -20,7 +25,6 @@ import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
-
 /**
  * FlutterWxworkPlugin
  */
@@ -126,6 +130,7 @@ public class FlutterWxworkPlugin implements FlutterPlugin, MethodCallHandler {
                             result.success("0");
                             return;
                         }
+                        assert data != null;
                         img.fileData = data.getBytes(StandardCharsets.UTF_8);
                         img.appPkg = packageName;
                         img.appName = appName;
