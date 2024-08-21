@@ -30,30 +30,46 @@ class FlutterWxwork {
       return false;
     }
   }
-  
-  Future<bool> sendReq(TextAttachment? text, FileAttachment? file, LinkAttachment? link) async {
-    if (text == null && file == null && link == null) {
-      assert(false, '发了个寂寞🐣');
-      return Future<bool>.value(false);
-    }
 
-    if (text != null) {
-      final result = await methodChannel.invokeMethod('sendReq', text.toJson());
-      return _stringToBool(result);
+  void shareText(String text) {
+    if (text.trim().isEmpty) {
+      assert(false, 'text is empty!');
     }
-    if (file != null) {
-      final result = await methodChannel.invokeMethod('sendReq', file.toJson());
-      return _stringToBool(result);
+    methodChannel.invokeMethod('share', {
+      'type': ShareType.text.value,
+      'text': text,
+    });
+  }
+
+  void shareImage({
+    String? name,
+    required Uint8List data,
+  }) {
+    methodChannel.invokeMethod('share', {
+      'type': ShareType.image.value,
+      'name': name,
+      'data': data,
+    });
+  }
+
+  void shareLink({
+    required String title,
+    required String summary,
+    required String url,
+    String? icon,
+  }) {
+    if (url.trim().isEmpty) {
+      assert(false, 'url is empty!');
     }
-    if (link != null) {
-      final result = await methodChannel.invokeMethod('sendReq', link.toJson());
-      return _stringToBool(result);
-    }
-    return Future<bool>.value(false);
+    methodChannel.invokeMethod('share', {
+      'type': ShareType.link.value,
+      'title': title,
+      'summary': summary,
+      'url': url,
+      'icon': icon,
+    });
   }
 }
-
-
 
 class AuthModel {
   /// 1.取消 0.成功 2.失败
@@ -61,7 +77,8 @@ class AuthModel {
   String? code;
   String? state;
 
-  bool get isSuccess =>  errCode == '1';
+  bool get isSuccess => errCode == '1';
+
   AuthModel();
 
   factory AuthModel.fromJson(Map<String, dynamic> json) {
@@ -82,37 +99,13 @@ class AuthModel {
   }
 }
 
-
-
-class TextAttachment {
-  static const int type = 1;
-  String? text;
-
-  Map<String, dynamic> toJson() =>
-    <String, dynamic>{'text': text, 'type': type};
-
+enum ShareType {
+  text,
+  image,
+  video,
+  link,
 }
 
-//文件、图片、视频
-class FileAttachment {
-  static const int type = 2;
-  FileAttachment({required this.data});
-  Uint8List data;
-  Map toJson() => {'data': data, };
-}
-
-//文件、图片、视频
-class LinkAttachment {
-  static const int type = 2;
-  String? title;//不能超过512bytes
-  String? summary;//不能超过1k
-  String? url;
-  String? iconurl;
-  String? icon;
-  int? withShareTicket;
-  String? shareTicketState;
-
-  Map<String, dynamic> toJson() =>
-    <String, dynamic>{'title': title, 'summary': summary, 'url': url, 'iconurl': iconurl, 'icon': icon, 'withShareTicket': withShareTicket, 'shareTicketState': shareTicketState, 'type': type};
-
+extension _ShareTypeEx on ShareType {
+  String get value => toString().split('.').last;
 }

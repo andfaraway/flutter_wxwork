@@ -12,8 +12,15 @@
 
 ## 0.0.4
 
-* 增加企业微信分享(感谢WANGNEWMAN)
+* Add Share feature
 
 ## 0.0.5
 
-* 修复安卓无法拉起问题
+* Fixed Android issues
+
+## 0.0.6
+
+* Bug fixes
+* Update README.md
+
+

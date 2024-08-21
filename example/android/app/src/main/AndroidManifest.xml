@@ -32,6 +32,5 @@
     </application>
     <queries>
         <package android:name="com.tencent.wework" />
-        // 指定企业微信包名
     </queries>
 </manifest>

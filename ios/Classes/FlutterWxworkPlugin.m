@@ -30,51 +30,42 @@ FlutterResult authResult;
      req.state = call.arguments[@"state"];
      [WWKApi sendReq:req];
      authResult = result;
-  } else if ([@"sendReq" isEqualToString:call.method]) {
-      if (call.arguments) {
-          NSDictionary *dic = call.arguments;
-          if (dic[@"type"]) {
-              NSInteger type = [dic[@"type"] intValue];
-              if (type == 1) {
-                  WWKSendMessageReq * req = [[WWKSendMessageReq alloc] init];
-                  WWKMessageTextAttachment * text = [[WWKMessageTextAttachment alloc] init];
-                  text.text = dic[@"text"];
-                  req.attachment = text;
-                  [WWKApi sendReq:req];
-                  authResult = result;
-              } else if (type == 2) {
-                  if ([dic[@"data"] isKindOfClass:FlutterStandardTypedData.class]) {
-                      FlutterStandardTypedData *imageData = dic[@"data"];
-                      WWKSendMessageReq * req = [[WWKSendMessageReq alloc] init];
-                      WWKMessageFileAttachment * file = [[WWKMessageFileAttachment alloc] init];
-                      file.data = imageData.data;
-                      req.attachment = file;
-                      [WWKApi sendReq:req];
-                      authResult = result;
-                  }else{
-                      result(@"0");
-                  }
-              } else if (type == 3) {
-                  WWKSendMessageReq * req = [[WWKSendMessageReq alloc] init];
-                  WWKMessageLinkAttachment * link = [[WWKMessageLinkAttachment alloc] init];
-                  link.title = dic[@"title"];
-                  link.summary = dic[@"summary"];
-                  link.url = dic[@"url"];
-                  link.iconurl = dic[@"iconurl"];
-                  link.icon = dic[@"icon"];
-                  link.withShareTicket = dic[@"withShareTicket"];
-                  link.shareTicketState = dic[@"shareTicketState"];
-                  req.attachment = link;
-                  [WWKApi sendReq:req];
-                  authResult = result;
-              }else{
-                  result(@"0");
-              }
-          }else{
-              result(@"0");
-          }
-      }else{
-          result(@"0");
+  }else if ([@"share" isEqualToString:call.method]) {
+      NSString *type = call.arguments[@"type"];
+      if ([@"text" isEqualToString:type]) {
+          WWKSendMessageReq * req = [[WWKSendMessageReq alloc] init];
+          WWKMessageTextAttachment * text = [[WWKMessageTextAttachment alloc] init];
+          text.text = call.arguments[@"text"];
+          req.attachment = text;
+          [WWKApi sendReq:req];
+      }else  if ([@"image" isEqualToString:type]) {
+          FlutterStandardTypedData *data = call.arguments[@"data"];
+          WWKSendMessageReq *req = [[WWKSendMessageReq alloc] init];
+          WWKMessageImageAttachment *attachment = [[WWKMessageImageAttachment alloc] init];
+          attachment.filename = call.arguments[@"name"];
+          attachment.path = call.arguments[@"path"];
+          attachment.data = data.data;
+          req.attachment = attachment;
+          [WWKApi sendReq:req];
+      }else  if ([@"link" isEqualToString:type]) {
+          // FlutterStandardTypedData *icon = call.arguments[@"icon"];
+          WWKSendMessageReq *req = [[WWKSendMessageReq alloc] init];
+          WWKMessageLinkAttachment *attachment = [[WWKMessageLinkAttachment alloc] init];
+          attachment.title = call.arguments[@"title"];
+          attachment.summary = call.arguments[@"summary"];
+          attachment.url = call.arguments[@"url"];
+          attachment.iconurl = call.arguments[@"icon"];
+          req.attachment = attachment;
+          [WWKApi sendReq:req];
+      }else  if ([@"file" isEqualToString:type]) {
+          WWKSendMessageReq *req = [[WWKSendMessageReq alloc] init];
+          WWKMessageFileAttachment *attachment = [[WWKMessageFileAttachment alloc] init];
+          attachment.filename = call.arguments[@"name"];
+          //attachment.data = data.data;
+          //FlutterStandardTypedData *data = call.arguments[@"data"];
+          attachment.path = call.arguments[@"path"];;
+          req.attachment = attachment;
+          [WWKApi sendReq:req];
       }
   }
 }
