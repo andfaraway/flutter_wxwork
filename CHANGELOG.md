@@ -23,4 +23,8 @@
 * Bug fixes
 * Update README.md
 
+## 0.0.7
+
+* Bug fixes 
+
 
