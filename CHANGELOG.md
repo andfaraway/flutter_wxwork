@@ -27,4 +27,12 @@
 
 * Bug fixes 
 
+## 0.0.8
+
+* Bug fixes
+
+## 0.0.9
+
+* Android sdk 3.0.0.7 updated. iOS sdk 0.17 updated(thanks @NEOLEE98)
+
 
