@@ -5,10 +5,19 @@
 //  Created by WXWork on 16/5/25.
 //  Copyright © 2019年 Tencent. All rights reserved.
 //
+#ifndef WWKApi_h
+#define WWKApi_h
 
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
 #import "WWKApiObject.h"
+
+typedef NS_ENUM(NSUInteger, WWKApiResponseErrorCode) {
+    WWKApiResponseErrorCodeOK = 0, // 无错误
+    WWKApiResponseErrorCodeNotRegister = 1, // 未注册SDK，请检查初始化流程
+    WWKApiResponseErrorCodeObjectEmpty = 2, // 序列化数据为空，请检查sessionKey是否正确设置
+    WWKApiResponseErrorCodeOpenAppFail = 3, // 调用OpenURL打开应用失败
+};
 
 #pragma mark - WWKApiDelegate
 /*! @brief 接收并处理来自企业微信终端程序的事件消息
@@ -148,18 +157,53 @@ typedef NS_ENUM(NSInteger, WWKDiplayNameType) {
  * @param state 第三方应用传入的值，登录成功后会透传给第三方应用
  * @see WWKSSOReq
  */
-+ (void)startSSOLogin:(NSString *)state fromNavigationController:(UINavigationController *)navigationController;
++ (void)startSSOLogin:(NSString *)state fromNavigationController:(UINavigationController *)navigationController API_DEPRECATED("Use the startSSOLogin:fromNavigationController:completionHandler instead.", ios(2.0, 11.0));
+
+/*!
+ * @brief 启动登录流程。WWKAPI中原有接口扩展的异步调用
+ * @param navigationController 当前页面的导航栏控制器
+ * @param state 第三方应用传入的值，登录成功后会透传给第三方应用
+ * @param completionHandler 异步回调，see WWKApiResponseErrorCode
+ * @see WWKSSOReq
+ */
++ (void)startSSOLogin:(NSString *)state fromNavigationController:(UINavigationController *)nav completionHandler:(void(^)(WWKApiResponseErrorCode errorCode))completionHandler API_AVAILABLE(ios(10.0));
+
+/*!
+ * @brief 启动登录流程。
+ * @param navigationController 当前页面的导航栏控制器
+ * @param state 第三方应用传入的值，登录成功后会透传给第三方应用
+ * @param scope 第三方应用传入的，需要向企微申请的权限
+ * @see WWKSSOReq
+ */
++ (void)startSSOLoginState:(NSString *)state scope:(NSString *)scope fromNavigationController:(UINavigationController *)navigationController API_DEPRECATED("Use the startSSOLoginState:scope:fromNavigationController:completionHandler instead.", ios(2.0, 11.0));
+
+/*!
+ * @brief 启动登录流程。WWKAPI中原有接口扩展的异步调用
+ * @param navigationController 当前页面的导航栏控制器
+ * @param state 第三方应用传入的值，登录成功后会透传给第三方应用
+ * @param scope 第三方应用传入的，需要向企微申请的权限
+ * @param completionHandler 异步回调，see WWKApiResponseErrorCode
+ * @see WWKSSOReq
+ */
++ (void)startSSOLoginState:(NSString *)state scope:(NSString *)scope fromNavigationController:(UINavigationController *)nav completionHandler:(void(^)(WWKApiResponseErrorCode errorCode))completionHandler API_AVAILABLE(ios(10.0));
 
 /*! @brief 发送请求到企业微信，等待企业微信返回onResp
  *
- * 函数调用后，会切换到企业微信的界面。第三方应用程序等待企业微信返回onResp。企业微信在异步处理完成后一定会调用onResp。支持以下类型
+ * 函数调用后，会切换到企业微信的界面。第三方应用程序等待企业微信返回onResp。企业微信在异步处理完成后调用onResp。支持以下类型
  * WWKSendMessageReq等。
  * @param req 具体的发送请求，在调用函数后，请自己释放。
  * @return 成功返回YES，失败返回NO。
  */
-+ (BOOL)sendReq:(WWKBaseReq *)req;
++ (BOOL)sendReq:(WWKBaseReq *)req API_DEPRECATED("Use the sendReq:completionHandler instead.", ios(2.0, 11.0));
 
-
+/*! @brief 发送请求到企业微信，等待企业微信返回onResp
+ *
+ * 函数调用后，会切换到企业微信的界面。第三方应用程序等待企业微信返回onResp。企业微信在异步处理完成后调用onResp。支持以下类型
+ * WWKSendMessageReq等。会根据setWWKApiAppType设置的类型调用对应的版本
+ * @param req 具体的发送请求，在调用函数后，请自己释放。
+ * @param completionHandler 异步回调，see WWKApiResponseErrorCode
+ */
++ (void)sendReq:(WWKBaseReq *)req completionHandler:(void(^)(WWKApiResponseErrorCode errorCode))completionHandler API_AVAILABLE(ios(10.0));
 
 /*! @brief 收到企业微信onReq的请求，发送对应的应答给企业微信，并切换到企业微信界面
  *
@@ -195,4 +239,7 @@ typedef NS_ENUM(NSInteger, WWKDiplayNameType) {
 * @see WWKOpenDataItem
 */
 +(void)getOpenData:(NSArray<WWKOpenDataItem *> *)dataList completion:(void (^)(NSError *error,NSArray<WWKOpenDataItem *> *dataArray))completion;
+
+
 @end
+#endif
