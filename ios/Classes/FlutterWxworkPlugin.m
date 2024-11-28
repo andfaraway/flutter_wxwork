@@ -28,7 +28,7 @@ FlutterResult authResult;
      WWKSSOReq *req = [[WWKSSOReq alloc] init];
      // state参数为这次请求的唯一标示，客户端需要维护其唯一性。SSO回调时会原样返回
      req.state = call.arguments[@"state"];
-     [WWKApi sendReq:req];
+     [WWKApi sendReq:req completionHandler:^(WWKApiResponseErrorCode errorCode) {}];
      authResult = result;
   }else if ([@"share" isEqualToString:call.method]) {
       NSString *type = call.arguments[@"type"];
@@ -37,7 +37,7 @@ FlutterResult authResult;
           WWKMessageTextAttachment * text = [[WWKMessageTextAttachment alloc] init];
           text.text = call.arguments[@"text"];
           req.attachment = text;
-          [WWKApi sendReq:req];
+          [WWKApi sendReq:req completionHandler:^(WWKApiResponseErrorCode errorCode) {}];
       }else  if ([@"image" isEqualToString:type]) {
           FlutterStandardTypedData *data = call.arguments[@"data"];
           WWKSendMessageReq *req = [[WWKSendMessageReq alloc] init];
@@ -46,7 +46,7 @@ FlutterResult authResult;
           attachment.path = call.arguments[@"path"];
           attachment.data = data.data;
           req.attachment = attachment;
-          [WWKApi sendReq:req];
+          [WWKApi sendReq:req completionHandler:^(WWKApiResponseErrorCode errorCode) {}];
       }else  if ([@"link" isEqualToString:type]) {
           // FlutterStandardTypedData *icon = call.arguments[@"icon"];
           WWKSendMessageReq *req = [[WWKSendMessageReq alloc] init];
@@ -56,7 +56,7 @@ FlutterResult authResult;
           attachment.url = call.arguments[@"url"];
           attachment.iconurl = call.arguments[@"icon"];
           req.attachment = attachment;
-          [WWKApi sendReq:req];
+          [WWKApi sendReq:req completionHandler:^(WWKApiResponseErrorCode errorCode) {}];
       }else  if ([@"file" isEqualToString:type]) {
           WWKSendMessageReq *req = [[WWKSendMessageReq alloc] init];
           WWKMessageFileAttachment *attachment = [[WWKMessageFileAttachment alloc] init];
@@ -65,7 +65,7 @@ FlutterResult authResult;
           //FlutterStandardTypedData *data = call.arguments[@"data"];
           attachment.path = call.arguments[@"path"];;
           req.attachment = attachment;
-          [WWKApi sendReq:req];
+          [WWKApi sendReq:req completionHandler:^(WWKApiResponseErrorCode errorCode) {}];
       }
   }
 }
