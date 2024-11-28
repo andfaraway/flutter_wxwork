@@ -18,6 +18,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface WWKBaseObject : NSObject
 @property (nonatomic, copy) NSString *bundleID;
 @property (nonatomic, copy) NSString *bundleName;
+@property (nonatomic, copy) NSString *appVersion;
 @property (nonatomic, assign) NSUInteger sequence;
 @property (nonatomic, readonly, nullable) NSData *serializedData;
 @property (nonatomic, readonly, nullable) NSMutableDictionary *serializedDict;
@@ -45,7 +46,9 @@ extern const int WWKBaseRespErrCodeNoPrivileges; // 没有此API的调用权限
 extern const int WWKBaseRespErrCodeInvalidCall; // 调用出错(例如传入参数不正确)
 extern const int WWKBaseRespErrCodeNetWork; // 网络出错(例如请求超时)
 extern const int WWKBaseRespErrCodeSessonKeyTimeOut; // sessionkey超时
-
+extern const int WWKBaseRespErrCodeNotSupportSubFunc; // 不支持的子接口
+extern const int WWKBaseRespErrCodeWeMeetNeedUpgrade; // 会议需要升级
+extern const int WWKBaseRespErrCodeWxWorkNeedUpgrade; //企微需要升级
 /*! @brief 该类为企业微信终端SDK所有响应类的基类
  *
  */
@@ -104,6 +107,7 @@ extern const int WWKBaseRespErrCodeSessonKeyTimeOut; // sessionkey超时
 // 是否使用带 shareTicket 的转发，只有注册了企业应用的agentid才有效；只能为单条转发，放在WWKMessageGroupAttachment中会被过滤
 @property (nonatomic, assign) BOOL withShareTicket;
 @property (nonatomic, copy, nullable) NSString *shareTicketState;
+@property (nonatomic, copy, nullable) NSString* canonicalUrl;
 @end
 
 /*!
@@ -138,12 +142,18 @@ extern const int WWKBaseRespErrCodeSessonKeyTimeOut; // sessionkey超时
 @property (nonatomic, retain) WWKMessageAttachment *attachment;
 @end
 
+typedef NS_ENUM(NSUInteger, WWKForwardType) {
+    WWKForwardTypeMerge = 0, // 合并转发
+    WWKForwardTypeSplit      // 逐条转发
+};
+
 /*!
  * @brief 聊天记录消息组
  */
 @interface WWKMessageGroupAttachment : WWKMessageAttachment
 @property (nonatomic, copy) NSArray<WWKMessageAttachmentWrapper *> *contents;
 @property (nonatomic, copy) NSString *title;
+@property (nonatomic, assign) WWKForwardType forwardType;
 @end
 
 
@@ -221,6 +231,8 @@ typedef NS_ENUM(NSUInteger, WWKOpenIdType) {
 
 @interface WWKSSOReq : WWKBaseReq <WWKApiSerializable>
 @property (nonatomic, copy) NSString *state;
+@property (nonatomic, copy) NSString *scope;
+@property (nonatomic, copy) NSString *version;
 @end
 
 @interface WWKSSOResp : WWKBaseResp <WWKApiSerializable>
@@ -320,6 +332,7 @@ typedef NS_ENUM(NSUInteger, WWKOpenIdType) {
 @property (nonatomic, copy) NSString *loginOpenUserid;
 @property (nonatomic, copy) NSArray<NSString *> *selectedOpenUserIds;
 @property (nonatomic, copy) NSArray<NSString *> *selectedTickets;
+@property (nonatomic, copy) NSString *meetingId;
 @end
 
 #pragma mark - WWKSelectPrivilegedContactResp
@@ -338,74 +351,5 @@ typedef NS_ENUM(NSUInteger, WWKOpenIdType) {
 @property (nonatomic, assign) uint32_t selectedUserCount;
 
 @end
-
-
-
-#pragma mark - WWKCreateChatWithMsgReq
-/*! @brief 新建群聊发消息(需登录态)
-*
-* 选人范围包括企业通讯录和外部联系人。
-* 支持用户传入openUserId，和selectedTicket
-* @see WWKCreateChatWithMsgResp
-*/
-@interface WWKCreateChatWithMsgReq : WWKBaseReq <WWKApiSerializable>
-/**
-*  loginOpenUserid 从后台登录获取的loginOpenUserid，必须填写这个字段
-*  selectedOpenUserIdList 创建会话的企业通讯录成员信息，格式为字符串，内容为成员的openid列表(可以从WWKSelectPrivilegedContactResp获取)，限定必须为应用的可见范围内。列表最多2000项。
-*  selectedTicketList 已选择的成员集合凭证列表，(可以从WWKSelectPrivilegedContactResp获取)。列表最多10个。
-*  attachment 消息内容结构体，支持文本、文件、图片、视频、链接、聊天内容，参考WWKMessageAttachment
-*  chatName 群聊名称
-*  state 透传参数，最长256，用于回调第三方应用创建群聊事件
-*
-*/
-
-@property (nonatomic, copy) NSString *loginOpenUserid;
-@property (nonatomic, copy) NSArray<NSString *> *selectedOpenUserIdList;
-@property (nonatomic, copy) NSArray<NSString *> *selectedTicketList;
-@property (nonatomic, retain) WWKMessageAttachment *attachment;
-@property (nonatomic, copy, nullable) NSString *chatName;
-@property (nonatomic, copy, nullable) NSString *state;
-@end
-
-#pragma mark - WWKCreateChatWithMsgResp
-
-/*! @brief 新建群聊发消息回包
-*
-* errorCode 错误码
-* errorMsg  错误码描述
-* chatId 若创建群成功，返回群ID
-*/
-@interface WWKCreateChatWithMsgResp : WWKBaseResp <WWKApiSerializable>
-@property (nonatomic, copy, nullable) NSString *chatId;
-@end
-
-
-
-#pragma mark - WWKOpenExistedChatWithMsgReq
-/*! @brief 打开群聊发消息(需登录态)
-*/
-@interface WWKOpenExistedChatWithMsgReq : WWKBaseReq <WWKApiSerializable>
-/**
-*  loginOpenUserid 从后台登录获取的loginOpenUserid，必须填写这个字段
-*  attachment 消息内容结构体，支持文本、文件、图片、视频、链接、聊天内容，参考WWKMessageAttachment attachment为可选。若不传参数，则无消息发送确认行为。
-*  chatId 打开群聊ID,chatId必须是当前用户所在的群聊
-*
-*/
-
-@property (nonatomic, copy) NSString *loginOpenUserid;
-@property (nonatomic, retain, nullable) WWKMessageAttachment *attachment;
-@property (nonatomic, copy) NSString *chatId;
-@end
-
-#pragma mark - WWKOpenExistedChatWithMsgResp
-
-/*! @brief 打开群聊发消息回包
-*
-* errorCode 错误码
-* errorMsg  错误码描述
-*/
-@interface WWKOpenExistedChatWithMsgResp : WWKBaseResp <WWKApiSerializable>
-@end
-
 
 NS_ASSUME_NONNULL_END

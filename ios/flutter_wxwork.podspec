@@ -18,6 +18,7 @@ A new Flutter plugin project.
   s.vendored_libraries = 'Assets/libWXWorkApi.a'
   s.dependency 'Flutter'
   s.platform = :ios, '11.0'
+  s.frameworks = ['WebKit']
 
   # Flutter.framework does not contain a i386 slice.
   s.pod_target_xcconfig = { 'DEFINES_MODULE' => 'YES', 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'i386' }
