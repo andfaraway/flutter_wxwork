@@ -65,7 +65,7 @@ $(inherited) -ObjC -l"WXWorkApi"
 ```  
 
 ### 网页端安卓签名获取
-[安卓签名工具](http://dldir1.qq.com/qqcontacts/Gen_Signature_Android.apk)
+[安卓签名工具](https://dldir1.qq.com/qqcontacts/Gen_Signature_Android.apk)
 
 
 如果对你有帮助,不吝给个start~ 谢谢佬们

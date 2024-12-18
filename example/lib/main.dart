@@ -43,14 +43,17 @@ class _MyAppState extends State<MyApp> {
                 _titleCell(
                     title: 'isAppInstalled',
                     onTap: () async {
-                      bool isInstall = await _flutterWxworkPlugin.isAppInstalled();
+                      bool isInstall =
+                          await _flutterWxworkPlugin.isAppInstalled();
                       _showMessage('isInstall = $isInstall');
                     }),
                 _titleCell(
                     title: 'register',
                     onTap: () async {
                       isRegister = await _flutterWxworkPlugin.register(
-                          scheme: 'wwauth8f1e80541af434bd000002', corpId: 'ww8f1e80541af434bd', agentId: '1000002');
+                          scheme: 'wwauth8f1e80541af434bd000002',
+                          corpId: 'ww8f1e80541af434bd',
+                          agentId: '1000002');
                       _showMessage('register = $isRegister');
                       setState(() {});
                     }),
@@ -73,12 +76,14 @@ class _MyAppState extends State<MyApp> {
                       _titleCell(
                           title: 'share image',
                           onTap: () async {
-                            final XFile? image = await picker.pickImage(source: ImageSource.gallery);
+                            final XFile? image = await picker.pickImage(
+                                source: ImageSource.gallery);
                             if (image == null) {
                               return;
                             }
                             Uint8List data = File(image.path).readAsBytesSync();
-                            _flutterWxworkPlugin.shareImage(name: 'name', data: data);
+                            _flutterWxworkPlugin.shareImage(
+                                name: 'name', data: data);
                           }),
                       _titleCell(
                           title: 'share link',
@@ -87,7 +92,8 @@ class _MyAppState extends State<MyApp> {
                                 title: 'example',
                                 summary: 'this is test',
                                 url: 'https://libin.zone',
-                                icon: 'https://libin.zone/src/wechat_awatar.png');
+                                icon:
+                                    'https://libin.zone/src/wechat_awatar.png');
                           }),
                     ],
                   )
@@ -97,7 +103,8 @@ class _MyAppState extends State<MyApp> {
     );
   }
 
-  Widget _titleCell({required String title, void Function()? onTap, Color? color}) {
+  Widget _titleCell(
+      {required String title, void Function()? onTap, Color? color}) {
     return Padding(
       padding: const EdgeInsets.all(8),
       child: InkWell(

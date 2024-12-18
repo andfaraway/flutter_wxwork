@@ -9,8 +9,16 @@ class FlutterWxwork {
     return _stringToBool(result);
   }
 
-  Future<bool> register({required String scheme, required String corpId, required String agentId}) async {
-    String? result = await methodChannel.invokeMethod<String>('register', <String, String>{
+  /// register
+  /// [scheme] Get it from the admin of WeCom
+  /// [corpId] Get it from the admin of WeCom
+  /// [agentId] Get it from the admin of WeCom
+  Future<bool> register(
+      {required String scheme,
+      required String corpId,
+      required String agentId}) async {
+    String? result =
+        await methodChannel.invokeMethod<String>('register', <String, String>{
       'scheme': scheme,
       'corpId': corpId,
       'agentId': agentId,
@@ -18,6 +26,7 @@ class FlutterWxwork {
     return _stringToBool(result);
   }
 
+  /// Pull up authority
   Future<AuthModel> auth({String state = 'state'}) async {
     var content = await methodChannel.invokeMethod('auth', {"state": state});
     return AuthModel.fromJson(Map<String, dynamic>.from(content));
@@ -31,6 +40,7 @@ class FlutterWxwork {
     }
   }
 
+  /// Share simple text
   void shareText(String text) {
     if (text.trim().isEmpty) {
       assert(false, 'text is empty!');
@@ -41,6 +51,7 @@ class FlutterWxwork {
     });
   }
 
+  /// Share image
   void shareImage({
     String? name,
     required Uint8List data,
@@ -52,6 +63,10 @@ class FlutterWxwork {
     });
   }
 
+  /// Share link
+  /// [title] Title of link
+  /// [summary] Summary of link
+  /// [url] Url of link
   void shareLink({
     required String title,
     required String summary,
@@ -71,6 +86,10 @@ class FlutterWxwork {
   }
 }
 
+/// 返回字典模型
+/// [errCode] 错误码
+/// [code] code码
+/// [state] 请求唯一标识
 class AuthModel {
   /// 1.取消 0.成功 2.失败
   String? errCode;
@@ -99,6 +118,7 @@ class AuthModel {
   }
 }
 
+/// 分享类型
 enum ShareType {
   text,
   image,

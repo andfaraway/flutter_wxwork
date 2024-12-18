@@ -25,7 +25,7 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
-  flutter_wxwork: 9aacf5f63932a6f2223b24d636cfb434d346e52a
+  flutter_wxwork: 15ef8f16c2ae0823a32132d1bbeed95c024b2da2
   image_picker_ios: c560581cceedb403a6ff17f2f816d7fea1421fc1
   integration_test: 252f60fa39af5e17c3aa9899d35d908a0721b573
 

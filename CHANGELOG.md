@@ -35,4 +35,8 @@
 
 * Android sdk 3.0.0.7 updated. iOS sdk 0.17 updated(thanks @NEOLEE98)
 
+## 0.0.10
+* Optimizing Documentation
+
+
 
