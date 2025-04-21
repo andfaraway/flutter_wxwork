@@ -99,10 +99,19 @@ class _MyAppState extends State<MyApp> {
                       _titleCell(
                           title: 'share miniProgram',
                           onTap: () async {
+
+                            final XFile? image = await picker.pickImage(
+                                source: ImageSource.gallery);
+                            if (image == null) {
+                              return;
+                            }
+                            Uint8List data = File(image.path).readAsBytesSync();
                             _flutterWxworkPlugin.shareMiniProgram(
                                 title: 'example',
                                 username: 'gh_5b4b3fff42a1',
-                                description: 'description',);
+                                description: 'description',
+                                hdImageData: data,
+                            );
                           }),
                     ],
                   )
