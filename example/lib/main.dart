@@ -1,4 +1,5 @@
 import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_wxwork/flutter_wxwork.dart';
@@ -94,6 +95,14 @@ class _MyAppState extends State<MyApp> {
                                 url: 'https://libin.zone',
                                 icon:
                                     'https://libin.zone/src/wechat_awatar.png');
+                          }),
+                      _titleCell(
+                          title: 'share miniProgram',
+                          onTap: () async {
+                            _flutterWxworkPlugin.shareMiniProgram(
+                                title: 'example',
+                                username: 'gh_5b4b3fff42a1',
+                                description: 'description',);
                           }),
                     ],
                   )
