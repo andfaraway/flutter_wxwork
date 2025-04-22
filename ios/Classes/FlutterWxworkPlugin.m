@@ -70,7 +70,7 @@ FlutterResult authResult;
           FlutterStandardTypedData *data = call.arguments[@"hdImageData"];
           WWKSendMessageReq *req = [[WWKSendMessageReq alloc] init];
           WWKMessageMiniAppAttachment *attachment = [[WWKMessageMiniAppAttachment alloc] init];
-          attachment.userName = call.arguments[@"userName"];
+          attachment.userName = call.arguments[@"username"];
           attachment.path = call.arguments[@"path"];
           attachment.hdImageData = data.data;
           attachment.title = call.arguments[@"title"];
