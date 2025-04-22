@@ -88,20 +88,20 @@ class FlutterWxwork {
   }
 
   /// Share miniApp
-  /// [title] Title of link
-  /// [summary] Summary of link
-  /// [url] Url of link
+  /// [title] 小程序标题
+  /// [userName] 小程序原始id
+  /// [hdImageData] 封面图
+  /// [path] 小程序路径
   void shareMiniProgram({
     required String title,
-    required String username,
+    required String userName,
     required Uint8List hdImageData,
-    String description = '',
     String? path,
   }) {
     methodChannel.invokeMethod('share', {
       'type': ShareType.miniProgram.value,
       'title': title,
-      'username': '$username@app',
+      'username': '$userName@app',
       'path': path,
       'hdImageData': hdImageData,
     });

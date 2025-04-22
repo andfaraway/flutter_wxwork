@@ -108,8 +108,7 @@ class _MyAppState extends State<MyApp> {
                             Uint8List data = File(image.path).readAsBytesSync();
                             _flutterWxworkPlugin.shareMiniProgram(
                                 title: 'example',
-                                username: 'gh_5b4b3fff42a1',
-                                description: 'description',
+                                userName: 'gh_5b4b3fff42a1',
                                 hdImageData: data,
                             );
                           }),
