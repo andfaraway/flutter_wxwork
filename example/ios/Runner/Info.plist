@@ -38,7 +38,7 @@
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
 			<key>CFBundleURLName</key>
-			<string>corp</string>
+			<string>corpId</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>ww8f1e80541af434bd</string>

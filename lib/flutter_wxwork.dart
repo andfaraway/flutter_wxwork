@@ -30,6 +30,7 @@ class FlutterWxwork {
   /// Pull up authority
   Future<AuthModel> auth({String state = 'state'}) async {
     var content = await methodChannel.invokeMethod('auth', {"state": state});
+    print(content);
     return AuthModel.fromJson(Map<String, dynamic>.from(content));
   }
 
@@ -93,15 +94,14 @@ class FlutterWxwork {
   void shareMiniProgram({
     required String title,
     required String username,
+    required Uint8List hdImageData,
     String description = '',
-    String path = '/',
-    Uint8List? hdImageData,
+    String? path,
   }) {
     methodChannel.invokeMethod('share', {
       'type': ShareType.miniProgram.value,
       'title': title,
       'username': '$username@app',
-      'description': description,
       'path': path,
       'hdImageData': hdImageData,
     });

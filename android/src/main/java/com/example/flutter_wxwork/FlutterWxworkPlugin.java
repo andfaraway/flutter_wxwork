@@ -18,6 +18,7 @@ import com.tencent.wework.api.model.WWMediaImage;
 import com.tencent.wework.api.model.WWMediaLink;
 import com.tencent.wework.api.model.WWMediaText;
 import com.tencent.wework.api.model.WWMediaVideo;
+import com.tencent.wework.api.model.WWMediaMiniProgram;
 
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
@@ -183,7 +184,7 @@ public class FlutterWxworkPlugin implements FlutterPlugin, MethodCallHandler {
                         }
                     });
                 } else if (Objects.equals(type, "miniProgram")) {
-                    byte[] byteArray = = call.argument("hdImageData");
+                    byte[] byteArray = call.argument("hdImageData");
                     WWMediaMiniProgram miniProgram = new WWMediaMiniProgram();
                     miniProgram.appPkg = packageName;
                     miniProgram.appName = appName;
@@ -197,9 +198,10 @@ public class FlutterWxworkPlugin implements FlutterPlugin, MethodCallHandler {
                     miniProgram.path = call.argument("path");
                     miniProgram.hdImageData = byteArray;
                     iwwapi.sendMessage(miniProgram, resp -> {
-                        if (resp instanceof WWMediaMiniProgram) {
-                            result.success("1");
-                        }
+//                        if (resp instanceof WWMediaMiniProgram) {
+//                            result.success("1");
+//                        }
+                        result.success("1");
                     });
                 }
                 break;

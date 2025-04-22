@@ -67,7 +67,6 @@ FlutterResult authResult;
           req.attachment = attachment;
           [WWKApi sendReq:req completionHandler:^(WWKApiResponseErrorCode errorCode) {}];
       }else  if ([@"miniProgram" isEqualToString:type]) {
-
           FlutterStandardTypedData *data = call.arguments[@"hdImageData"];
           WWKSendMessageReq *req = [[WWKSendMessageReq alloc] init];
           WWKMessageMiniAppAttachment *attachment = [[WWKMessageMiniAppAttachment alloc] init];
