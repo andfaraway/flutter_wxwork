@@ -198,10 +198,9 @@ public class FlutterWxworkPlugin implements FlutterPlugin, MethodCallHandler {
                     miniProgram.path = call.argument("path");
                     miniProgram.hdImageData = byteArray;
                     iwwapi.sendMessage(miniProgram, resp -> {
-//                        if (resp instanceof WWMediaMiniProgram) {
-//                            result.success("1");
-//                        }
-                        result.success("1");
+                        if (resp instanceof WWMediaMiniProgram) {
+                            result.success("1");
+                        }
                     });
                 }
                 break;
