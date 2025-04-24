@@ -30,7 +30,6 @@ class FlutterWxwork {
   /// Pull up authority
   Future<AuthModel> auth({String state = 'state'}) async {
     var content = await methodChannel.invokeMethod('auth', {"state": state});
-    print(content);
     return AuthModel.fromJson(Map<String, dynamic>.from(content));
   }
 
