@@ -1,6 +1,6 @@
 name: flutter_wxwork
 description: The Flutter plugin for WeCom supports registration, authorization, login, and sharing functions.
-version: 0.0.10
+version: 0.0.11
 homepage: https://github.com/andfaraway/flutter_wxwork
 
 environment:

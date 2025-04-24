@@ -38,5 +38,8 @@
 ## 0.0.10
 * Optimizing Documentation
 
+## 0.0.11
+* 添加小程序分享 @xiaodel
+
 
 
