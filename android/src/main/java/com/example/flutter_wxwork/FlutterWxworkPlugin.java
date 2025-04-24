@@ -18,6 +18,7 @@ import com.tencent.wework.api.model.WWMediaImage;
 import com.tencent.wework.api.model.WWMediaLink;
 import com.tencent.wework.api.model.WWMediaText;
 import com.tencent.wework.api.model.WWMediaVideo;
+import com.tencent.wework.api.model.WWMediaMiniProgram;
 
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
@@ -179,6 +180,25 @@ public class FlutterWxworkPlugin implements FlutterPlugin, MethodCallHandler {
                     link.agentId = AGENTID; //应用唯一标识。显示在具体应用下的 AgentId字段
                     iwwapi.sendMessage(link, resp -> {
                         if (resp instanceof WWMediaLink) {
+                            result.success("1");
+                        }
+                    });
+                } else if (Objects.equals(type, "miniProgram")) {
+                    byte[] byteArray = call.argument("hdImageData");
+                    WWMediaMiniProgram miniProgram = new WWMediaMiniProgram();
+                    miniProgram.appPkg = packageName;
+                    miniProgram.appName = appName;
+                    miniProgram.appId = APPID; //企业唯一标识。创建企业后显示在，我的企业 CorpID字段
+                    miniProgram.agentId = AGENTID; //应用唯一标识。显示在具体应用下的 AgentId字段
+                    miniProgram.schema = SCHEMA;
+
+                    miniProgram.title = call.argument("title");
+                    miniProgram.username = call.argument("username");
+                    miniProgram.description = call.argument("description");
+                    miniProgram.path = call.argument("path");
+                    miniProgram.hdImageData = byteArray;
+                    iwwapi.sendMessage(miniProgram, resp -> {
+                        if (resp instanceof WWMediaMiniProgram) {
                             result.success("1");
                         }
                     });

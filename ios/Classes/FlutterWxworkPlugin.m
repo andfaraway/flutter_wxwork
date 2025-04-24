@@ -66,6 +66,16 @@ FlutterResult authResult;
           attachment.path = call.arguments[@"path"];;
           req.attachment = attachment;
           [WWKApi sendReq:req completionHandler:^(WWKApiResponseErrorCode errorCode) {}];
+      }else  if ([@"miniProgram" isEqualToString:type]) {
+          FlutterStandardTypedData *data = call.arguments[@"hdImageData"];
+          WWKSendMessageReq *req = [[WWKSendMessageReq alloc] init];
+          WWKMessageMiniAppAttachment *attachment = [[WWKMessageMiniAppAttachment alloc] init];
+          attachment.userName = call.arguments[@"username"];
+          attachment.path = call.arguments[@"path"];
+          attachment.hdImageData = data.data;
+          attachment.title = call.arguments[@"title"];
+          req.attachment = attachment;
+          [WWKApi sendReq:req completionHandler:^(WWKApiResponseErrorCode errorCode) {}];
       }
   }
 }

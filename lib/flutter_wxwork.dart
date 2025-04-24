@@ -1,4 +1,5 @@
 import 'dart:convert';
+
 import 'package:flutter/services.dart';
 
 class FlutterWxwork {
@@ -84,6 +85,26 @@ class FlutterWxwork {
       'icon': icon,
     });
   }
+
+  /// Share miniApp
+  /// [title] 小程序标题
+  /// [userName] 小程序原始id
+  /// [hdImageData] 封面图
+  /// [path] 小程序路径
+  void shareMiniProgram({
+    required String title,
+    required String userName,
+    required Uint8List hdImageData,
+    String? path,
+  }) {
+    methodChannel.invokeMethod('share', {
+      'type': ShareType.miniProgram.value,
+      'title': title,
+      'username': '$userName@app',
+      'path': path,
+      'hdImageData': hdImageData,
+    });
+  }
 }
 
 /// 返回字典模型
@@ -124,6 +145,7 @@ enum ShareType {
   image,
   video,
   link,
+  miniProgram,
 }
 
 extension _ShareTypeEx on ShareType {
